@@ -1,71 +1,241 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pomodoro & Lo-fi Timer</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <title>초등 맘스스쿨 - 엄마표 무료 프린트 학습지</title>
+    <style>
+        /* 기본 색상 및 폰트 설정 */
+        :root {
+            --primary-color: #4A90E2;
+            --secondary-color: #F5A623;
+            --bg-color: #F9F9FB;
+            --text-color: #333333;
+        }
+        
+        body {
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        /* 상단 네비게이션 바 */
+        header {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        nav a {
+            margin-left: 1.5rem;
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        nav a:hover {
+            color: var(--primary-color);
+        }
+
+        /* 메인 히어로 배너 */
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
+        }
+
+        .hero h1 {
+            margin-top: 0;
+            color: #1565C0;
+            font-size: 2.2rem;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: #424242;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 2rem;
+            background-color: var(--secondary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #E65100;
+        }
+
+        /* 본문 컨텐츠 영역 */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 5%;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--text-color);
+        }
+
+        /* 학년별 카테고리 그리드 */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            text-align: center;
+            border-top: 5px solid var(--primary-color);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        .download-btn {
+            display: block;
+            margin-top: 1rem;
+            padding: 0.5rem;
+            background-color: #F0F4F8;
+            color: var(--primary-color);
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .download-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* 광고 배너 공간 (수익화 핵심) */
+        .ad-banner {
+            background-color: #E0E0E0;
+            color: #757575;
+            text-align: center;
+            padding: 2.5rem 1rem;
+            margin: 3rem 0;
+            border-radius: 8px;
+            border: 2px dashed #BDBDBD;
+            font-size: 0.9rem;
+        }
+
+        /* 하단 푸터 */
+        footer {
+            background-color: #2C3E50;
+            color: white;
+            text-align: center;
+            padding: 2rem 5%;
+            margin-top: 4rem;
+        }
+
+        /* 모바일 대응 */
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            nav a {
+                margin: 0 0.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div id="app">
-        <div class="card timer-card">
-            <button id="settings-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1 0-2l.15-.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            </button>
-            <div id="timer-mode">
-                <button class="mode-btn active" data-mode="pomodoro">Pomodoro</button>
-                <button class="mode-btn" data-mode="shortBreak">Short Break</button>
-                <button class="mode-btn" data-mode="longBreak">Long Break</button>
+
+    <header>
+        <a href="#" class="logo">✏️ 초등 맘스스쿨</a>
+        <nav>
+            <a href="#">국어</a>
+            <a href="#">수학</a>
+            <a href="#">영어</a>
+            <a href="#">엄마표 자료실</a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1>우리아이 맞춤형 무료 프린트 학습지</h1>
+            <p>매주 업데이트되는 학년별, 과목별 핵심 요점과 문제풀이 자료를<br>가정에서 손쉽게 프린트해서 사용해 보세요.</p>
+            <a href="#categories" class="btn">이번 주 신규 학습지 보기</a>
+        </section>
+
+        <div class="container">
+            <div class="ad-banner">
+                [수익화 배너 광고 영역]<br>여기에 구글 애드센스 또는 교육 관련 제휴 마케팅 배너가 들어갑니다.
             </div>
-            <div id="time">25:00</div>
-            <div id="controls">
-                <button id="start">Start</button>
-                <button id="pause" style="display: none;">Pause</button>
-                <button id="reset"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg></button>
+
+            <h2 class="section-title" id="categories">학년별 자료실</h2>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>초등 1~2학년</h3>
+                    <p>한글 떼기, 기초 연산, 바른 글씨 쓰기 등 저학년 맞춤형 흥미 위주 학습지</p>
+                    <a href="#" class="download-btn">자료 보러가기</a>
+                </div>
+
+                <div class="card">
+                    <h3>초등 3~4학년</h3>
+                    <p>본격적인 교과 학습 시작! 구구단 완벽 마스터, 어휘력 향상, 독해력 프린트</p>
+                    <a href="#" class="download-btn">자료 보러가기</a>
+                </div>
+
+                <div class="card">
+                    <h3>초등 5~6학년</h3>
+                    <p>중학교 진학 대비 심화 학습. 분수와 소수, 한국사 요점 정리, 영단어장</p>
+                    <a href="#" class="download-btn">자료 보러가기</a>
+                </div>
+            </div>
+
+            <div class="ad-banner">
+                [수익화 배너 광고 영역]<br>페이지 하단 광고는 클릭률이 높습니다. 학습지와 연관된 교육 상품 배너를 추천합니다.
             </div>
         </div>
+    </main>
 
-        <div class="card music-card">
-            <h2>Music Controls</h2>
-            <div id="youtube-player" style="display: none;"></div>
-            <div id="music-controls">
-                <button id="play-music">Play</button>
-                <button id="pause-music" style="display: none;">Pause</button>
-                <input type="range" id="volume-slider" min="0" max="100" step="1" value="100">
-            </div>
-        </div>
+    <footer>
+        <p>&copy; 2026 초등 맘스스쿨. All rights reserved.</p>
+        <p style="font-size: 0.8rem; color: #aaa; margin-top: 1rem;">본 사이트의 모든 자료는 가정 내 학습용으로만 무료 제공되며, 무단 전재 및 상업적 이용을 금합니다.</p>
+    </footer>
 
-        <div class="card quote-card">
-             <p id="quote-text">"The secret of getting ahead is getting started."</p>
-             <p id="quote-author">- Mark Twain</p>
-            <button id="share">Share</button>
-        </div>
-    </div>
-
-    <div id="settings-modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close-btn">&times;</span>
-            <h2>Timer Settings</h2>
-            <div class="setting">
-                <label for="pomodoro-duration">Pomodoro (minutes)</label>
-                <input type="number" id="pomodoro-duration" min="1" value="25">
-            </div>
-            <div class="setting">
-                <label for="short-break-duration">Short Break (minutes)</label>
-                <input type="number" id="short-break-duration" min="1" value="5">
-            </div>
-            <div class="setting">
-                <label for="long-break-duration">Long Break (minutes)</label>
-                <input type="number" id="long-break-duration" min="1" value="15">
-            </div>
-            <button id="save-settings">Save</button>
-        </div>
-    </div>
-
-    <script src="https://www.youtube.com/iframe_api"></script>
-    <script src="main.js"></script>
 </body>
 </html>
