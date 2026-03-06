@@ -1,241 +1,89 @@
 <!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>초등 맘스스쿨 - 엄마표 무료 프린트 학습지</title>
-    <style>
-        /* 기본 색상 및 폰트 설정 */
-        :root {
-            --primary-color: #4A90E2;
-            --secondary-color: #F5A623;
-            --bg-color: #F9F9FB;
-            --text-color: #333333;
-        }
-        
-        body {
-            font-family: 'Pretendard', 'Apple SD Gothic Neo', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
-        }
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to Firebase Hosting</title>
 
-        /* 상단 네비게이션 바 */
-        header {
-            background-color: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            padding: 1rem 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/12.10.0/firebase-app-compat.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/12.10.0/firebase-auth-compat.js"></script>
+    <script defer src="/__/firebase/12.10.0/firebase-database-compat.js"></script>
+    <script defer src="/__/firebase/12.10.0/firebase-firestore-compat.js"></script>
+    <script defer src="/__/firebase/12.10.0/firebase-functions-compat.js"></script>
+    <script defer src="/__/firebase/12.10.0/firebase-messaging-compat.js"></script>
+    <script defer src="/__/firebase/12.10.0/firebase-storage-compat.js"></script>
+    <script defer src="/__/firebase/12.10.0/firebase-analytics-compat.js"></script>
+    <script defer src="/__/firebase/12.10.0/firebase-remote-config-compat.js"></script>
+    <script defer src="/__/firebase/12.10.0/firebase-performance-compat.js"></script>
+    <!-- 
+      initialize the SDK after all desired features are loaded, set useEmulator to false
+      to avoid connecting the SDK to running emulators.
+    -->
+    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
 
-        .logo {
-            font-size: 1.4rem;
-            font-weight: 800;
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-
-        nav a {
-            margin-left: 1.5rem;
-            text-decoration: none;
-            color: var(--text-color);
-            font-weight: 600;
-        }
-
-        nav a:hover {
-            color: var(--primary-color);
-        }
-
-        /* 메인 히어로 배너 */
-        .hero {
-            text-align: center;
-            padding: 4rem 2rem;
-            background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
-        }
-
-        .hero h1 {
-            margin-top: 0;
-            color: #1565C0;
-            font-size: 2.2rem;
-        }
-
-        .hero p {
-            font-size: 1.1rem;
-            color: #424242;
-            margin-bottom: 2rem;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 0.8rem 2rem;
-            background-color: var(--secondary-color);
-            color: white;
-            text-decoration: none;
-            border-radius: 30px;
-            font-weight: bold;
-            transition: background 0.3s;
-        }
-
-        .btn:hover {
-            background-color: #E65100;
-        }
-
-        /* 본문 컨텐츠 영역 */
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 2rem 5%;
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 2rem;
-            color: var(--text-color);
-        }
-
-        /* 학년별 카테고리 그리드 */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-            text-align: center;
-            border-top: 5px solid var(--primary-color);
-            transition: transform 0.2s;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-        }
-
-        .card h3 {
-            margin-top: 0;
-            color: var(--primary-color);
-        }
-
-        .card p {
-            font-size: 0.95rem;
-            color: #666;
-        }
-
-        .download-btn {
-            display: block;
-            margin-top: 1rem;
-            padding: 0.5rem;
-            background-color: #F0F4F8;
-            color: var(--primary-color);
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-
-        .download-btn:hover {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        /* 광고 배너 공간 (수익화 핵심) */
-        .ad-banner {
-            background-color: #E0E0E0;
-            color: #757575;
-            text-align: center;
-            padding: 2.5rem 1rem;
-            margin: 3rem 0;
-            border-radius: 8px;
-            border: 2px dashed #BDBDBD;
-            font-size: 0.9rem;
-        }
-
-        /* 하단 푸터 */
-        footer {
-            background-color: #2C3E50;
-            color: white;
-            text-align: center;
-            padding: 2rem 5%;
-            margin-top: 4rem;
-        }
-
-        /* 모바일 대응 */
-        @media (max-width: 600px) {
-            header {
-                flex-direction: column;
-                gap: 1rem;
-            }
-            nav a {
-                margin: 0 0.5rem;
-            }
-        }
+    <style media="screen">
+      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
+      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
+      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
+      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
+      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
+      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
+      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
+      @media (max-width: 600px) {
+        body, #message { margin-top: 0; background: white; box-shadow: none; }
+        body { border-top: 16px solid #ffa100; }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <div id="message">
+      <h2>Welcome</h2>
+      <h1>Firebase Hosting Setup Complete</h1>
+      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
+      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
+    </div>
+    <p id="load">Firebase SDK Loading&hellip;</p>
 
-    <header>
-        <a href="#" class="logo">✏️ 초등 맘스스쿨</a>
-        <nav>
-            <a href="#">국어</a>
-            <a href="#">수학</a>
-            <a href="#">영어</a>
-            <a href="#">엄마표 자료실</a>
-        </nav>
-    </header>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const loadEl = document.querySelector('#load');
+        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+        // // The Firebase SDK is initialized and available here!
+        //
+        // firebase.auth().onAuthStateChanged(user => { });
+        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
+        // firebase.firestore().doc('/foo/bar').get().then(() => { });
+        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
+        // firebase.messaging().requestPermission().then(() => { });
+        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
+        // firebase.analytics(); // call to activate
+        // firebase.analytics().logEvent('tutorial_completed');
+        // firebase.performance(); // call to activate
+        //
+        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
 
-    <main>
-        <section class="hero">
-            <h1>우리아이 맞춤형 무료 프린트 학습지</h1>
-            <p>매주 업데이트되는 학년별, 과목별 핵심 요점과 문제풀이 자료를<br>가정에서 손쉽게 프린트해서 사용해 보세요.</p>
-            <a href="#categories" class="btn">이번 주 신규 학습지 보기</a>
-        </section>
-
-        <div class="container">
-            <div class="ad-banner">
-                [수익화 배너 광고 영역]<br>여기에 구글 애드센스 또는 교육 관련 제휴 마케팅 배너가 들어갑니다.
-            </div>
-
-            <h2 class="section-title" id="categories">학년별 자료실</h2>
-            
-            <div class="grid">
-                <div class="card">
-                    <h3>초등 1~2학년</h3>
-                    <p>한글 떼기, 기초 연산, 바른 글씨 쓰기 등 저학년 맞춤형 흥미 위주 학습지</p>
-                    <a href="#" class="download-btn">자료 보러가기</a>
-                </div>
-
-                <div class="card">
-                    <h3>초등 3~4학년</h3>
-                    <p>본격적인 교과 학습 시작! 구구단 완벽 마스터, 어휘력 향상, 독해력 프린트</p>
-                    <a href="#" class="download-btn">자료 보러가기</a>
-                </div>
-
-                <div class="card">
-                    <h3>초등 5~6학년</h3>
-                    <p>중학교 진학 대비 심화 학습. 분수와 소수, 한국사 요점 정리, 영단어장</p>
-                    <a href="#" class="download-btn">자료 보러가기</a>
-                </div>
-            </div>
-
-            <div class="ad-banner">
-                [수익화 배너 광고 영역]<br>페이지 하단 광고는 클릭률이 높습니다. 학습지와 연관된 교육 상품 배너를 추천합니다.
-            </div>
-        </div>
-    </main>
-
-    <footer>
-        <p>&copy; 2026 초등 맘스스쿨. All rights reserved.</p>
-        <p style="font-size: 0.8rem; color: #aaa; margin-top: 1rem;">본 사이트의 모든 자료는 가정 내 학습용으로만 무료 제공되며, 무단 전재 및 상업적 이용을 금합니다.</p>
-    </footer>
-
-</body>
+        try {
+          let app = firebase.app();
+          let features = [
+            'auth', 
+            'database', 
+            'firestore',
+            'functions',
+            'messaging', 
+            'storage', 
+            'analytics', 
+            'remoteConfig',
+            'performance',
+          ].filter(feature => typeof app[feature] === 'function');
+          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
+        } catch (e) {
+          console.error(e);
+          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
+        }
+      });
+    </script>
+  </body>
 </html>
