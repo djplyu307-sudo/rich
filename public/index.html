@@ -1,151 +1,89 @@
 <!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>유튜브 영상 요약기</title>
-    <style>
-        body { 
-            font-family: 'Pretendard', 'Malgun Gothic', sans-serif; 
-            background-color: #f4f7f6; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-        }
-        .container { 
-            background: white; 
-            padding: 40px 30px; 
-            border-radius: 16px; 
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05); 
-            width: 100%; 
-            max-width: 500px; 
-            text-align: center; 
-        }
-        h1 { 
-            color: #2c3e50; 
-            font-size: 26px; 
-            margin-bottom: 10px; 
-        }
-        p {
-            color: #7f8c8d;
-            margin-bottom: 25px;
-            font-size: 15px;
-        }
-        input[type="text"] { 
-            width: 100%; 
-            padding: 14px; 
-            border: 1px solid #e0e0e0; 
-            border-radius: 8px; 
-            box-sizing: border-box; 
-            margin-bottom: 15px; 
-            font-size: 15px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        input[type="text"]:focus {
-            border-color: #3498db;
-        }
-        button { 
-            background-color: #3498db; 
-            color: white; 
-            border: none; 
-            padding: 14px 20px; 
-            width: 100%; 
-            border-radius: 8px; 
-            font-size: 16px; 
-            font-weight: bold;
-            cursor: pointer; 
-            transition: background 0.3s; 
-        }
-        button:hover { 
-            background-color: #2980b9; 
-        }
-        .result-box { 
-            margin-top: 25px; 
-            padding: 20px; 
-            border-radius: 8px; 
-            background-color: #f8f9fa; 
-            border: 1px solid #e9ecef; 
-            text-align: left; 
-            min-height: 100px; 
-            display: none; 
-            line-height: 1.6;
-            color: #34495e;
-        }
-        .loader { 
-            border: 4px solid #f3f3f3; 
-            border-top: 4px solid #3498db; 
-            border-radius: 50%; 
-            width: 35px; 
-            height: 35px; 
-            animation: spin 1s linear infinite; 
-            margin: 30px auto; 
-            display: none; 
-        }
-        @keyframes spin { 
-            0% { transform: rotate(0deg); } 
-            100% { transform: rotate(360deg); } 
-        }
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Welcome to Firebase Hosting</title>
+
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/12.10.0/firebase-app-compat.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/12.10.0/firebase-auth-compat.js"></script>
+    <script defer src="/__/firebase/12.10.0/firebase-database-compat.js"></script>
+    <script defer src="/__/firebase/12.10.0/firebase-firestore-compat.js"></script>
+    <script defer src="/__/firebase/12.10.0/firebase-functions-compat.js"></script>
+    <script defer src="/__/firebase/12.10.0/firebase-messaging-compat.js"></script>
+    <script defer src="/__/firebase/12.10.0/firebase-storage-compat.js"></script>
+    <script defer src="/__/firebase/12.10.0/firebase-analytics-compat.js"></script>
+    <script defer src="/__/firebase/12.10.0/firebase-remote-config-compat.js"></script>
+    <script defer src="/__/firebase/12.10.0/firebase-performance-compat.js"></script>
+    <!-- 
+      initialize the SDK after all desired features are loaded, set useEmulator to false
+      to avoid connecting the SDK to running emulators.
+    -->
+    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+
+    <style media="screen">
+      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
+      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
+      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
+      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
+      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
+      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
+      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
+      @media (max-width: 600px) {
+        body, #message { margin-top: 0; background: white; box-shadow: none; }
+        body { border-top: 16px solid #ffa100; }
+      }
     </style>
-</head>
-<body>
-    <div class="container">
-        <h1>유튜브 영상 요약기 📺</h1>
-        <p>바빠서 다 못 보는 영상, 링크만 넣고 핵심을 확인하세요.</p>
-        
-        <input type="text" id="youtubeUrl" placeholder="https://www.youtube.com/watch?v=...">
-        <button onclick="summarizeVideo()">3줄 요약하기</button>
-        
-        <div class="loader" id="loader"></div>
-        
-        <div class="result-box" id="resultBox">
-            <h3 style="margin-top: 0; color: #2c3e50;">💡 요약 결과</h3>
-            <div id="summaryText"></div>
-        </div>
+  </head>
+  <body>
+    <div id="message">
+      <h2>Welcome</h2>
+      <h1>Firebase Hosting Setup Complete</h1>
+      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
+      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
     </div>
+    <p id="load">Firebase SDK Loading&hellip;</p>
 
     <script>
-        async function summarizeVideo() {
-            const urlInput = document.getElementById('youtubeUrl').value;
-            const loader = document.getElementById('loader');
-            const resultBox = document.getElementById('resultBox');
-            const summaryText = document.getElementById('summaryText');
+      document.addEventListener('DOMContentLoaded', function() {
+        const loadEl = document.querySelector('#load');
+        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+        // // The Firebase SDK is initialized and available here!
+        //
+        // firebase.auth().onAuthStateChanged(user => { });
+        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
+        // firebase.firestore().doc('/foo/bar').get().then(() => { });
+        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
+        // firebase.messaging().requestPermission().then(() => { });
+        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
+        // firebase.analytics(); // call to activate
+        // firebase.analytics().logEvent('tutorial_completed');
+        // firebase.performance(); // call to activate
+        //
+        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
 
-            if (!urlInput.includes('youtube.com') && !urlInput.includes('youtu.be')) {
-                alert('올바른 유튜브 링크를 입력해주세요!');
-                return;
-            }
-
-            // UI 업데이트: 결과창 숨기고 로딩 표시 시작
-            loader.style.display = 'block';
-            resultBox.style.display = 'none';
-
-            try {
-                const response = await fetch('/summarize', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ videoUrl: urlInput }),
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    summaryText.innerText = data.summary;
-                } else {
-                    summaryText.innerText = `요약 실패: ${data.error}`;
-                }
-
-            } catch (error) {
-                summaryText.innerText = `오류 발생: ${error.message}`;
-            } finally {
-                loader.style.display = 'none';
-                resultBox.style.display = 'block';
-            }
+        try {
+          let app = firebase.app();
+          let features = [
+            'auth', 
+            'database', 
+            'firestore',
+            'functions',
+            'messaging', 
+            'storage', 
+            'analytics', 
+            'remoteConfig',
+            'performance',
+          ].filter(feature => typeof app[feature] === 'function');
+          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
+        } catch (e) {
+          console.error(e);
+          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
         }
+      });
     </script>
-</body>
+  </body>
 </html>
