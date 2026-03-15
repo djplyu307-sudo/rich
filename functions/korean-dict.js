@@ -17,8 +17,8 @@ export async function onRequestGet(context) {
   // ── 모드 1: 특정 글자로 시작하는 단어 검색 (AI 응답용) ──
   if (startWith) {
     try {
-      // type_search=start: 해당 글자로 시작하는 단어 검색
-      const apiUrl = `https://stdict.korean.go.kr/api/search.do?key=${apiKey}&q=${encodeURIComponent(startWith)}&type_search=start&part=word&sort=popular&num=30&output=json`;
+      // 국립국어원 서버 SSL 호환성을 위해 http로 호출
+      const apiUrl = `http://stdict.korean.go.kr/api/search.do?key=${apiKey}&q=${encodeURIComponent(startWith)}&type_search=start&part=word&sort=popular&num=30&output=json`;
       const res = await fetch(apiUrl);
       if (!res.ok) return json({ error: `사전 API 오류: ${res.status}` }, 502);
 
@@ -74,7 +74,7 @@ export async function onRequestGet(context) {
   if (!word) return json({ error: 'word 또는 startWith 파라미터가 필요해요' }, 400);
 
   try {
-    const apiUrl = `https://stdict.korean.go.kr/api/search.do?key=${apiKey}&q=${encodeURIComponent(word)}&type_search=search&part=word&sort=popular&num=10&output=json`;
+    const apiUrl = `http://stdict.korean.go.kr/api/search.do?key=${apiKey}&q=${encodeURIComponent(word)}&type_search=search&part=word&sort=popular&num=10&output=json`;
     const res = await fetch(apiUrl);
     if (!res.ok) return json({ error: `사전 API 오류: ${res.status}` }, 502);
     const data = await res.json();
