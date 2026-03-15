@@ -1061,11 +1061,25 @@ async function checkWordExists(word) {
   }
 }
 
-// AI 응답 단어: CHAIN_DB에서 찾기 (DB 단어는 실제 단어만 수록)
-function getAIWord(ch) {
-  const candidates = (CHAIN_DB[ch] || []).filter(w => !usedWords.has(w));
-  if (candidates.length === 0) return null;
-  return candidates[ri(candidates.length)];
+// AI 응답 단어: 국립국어원 API로 해당 글자로 시작하는 단어 검색
+// CHAIN_DB는 API 실패 시 폴백으로만 사용
+async function getAIWord(ch) {
+  try {
+    const res = await fetch(`/korean-dict?startWith=${encodeURIComponent(ch)}`);
+    if (!res.ok) throw new Error('API 오류');
+    const data = await res.json();
+    const words = (data.words || []).filter(w => !usedWords.has(w));
+    if (words.length > 0) {
+      // 인기 단어 상위 5개 중 랜덤 선택 (자연스러운 대화처럼)
+      const pool = words.slice(0, 5);
+      return pool[ri(pool.length)];
+    }
+  } catch (e) {
+    console.warn('AI 단어 검색 API 오류, DB 폴백:', e.message);
+  }
+  // 폴백: CHAIN_DB에서 찾기
+  const fallback = (CHAIN_DB[ch] || []).filter(w => !usedWords.has(w));
+  return fallback.length > 0 ? fallback[ri(fallback.length)] : null;
 }
 
 function startChain() {
@@ -1161,10 +1175,11 @@ async function submitChain() {
   addCMsg(word, 'user');
   upEl('cc', chainCount);
 
-  // 5. AI 응답
-  setTimeout(() => {
+  // 5. AI 응답 (API 호출이라 async)
+  addCHint('🤖 AI가 생각 중...');
+  setTimeout(async () => {
     if (!gameActive) return;
-    const aiWord = getAIWord(lastCh(word));
+    const aiWord = await getAIWord(lastCh(word));
     if (!aiWord) {
       addCHint('🤖 AI가 막혔어요! 당신이 이겼어요! 🎉');
       showChainResult(true);
@@ -1176,7 +1191,7 @@ async function submitChain() {
     addCHint(`👉 "${lastCh(aiWord)}"로 시작하는 단어를 입력하세요!`);
     setChainLock(false);
     inp.focus();
-  }, 700);
+  }, 300);
 }
 
 function showChainResult(won) {
