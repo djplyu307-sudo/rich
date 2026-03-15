@@ -17,16 +17,54 @@ export async function onRequestGet(context) {
   // ── 모드 1: 특정 글자로 시작하는 단어 검색 (AI 응답용) ──
   if (startWith) {
     try {
-      const apiUrl = `https://stdict.korean.go.kr/api/search.do?key=${apiKey}&q=${encodeURIComponent(startWith)}&type_search=start&part=word&sort=popular&num=20&output=json`;
+      // type_search=start: 해당 글자로 시작하는 단어 검색
+      const apiUrl = `https://stdict.korean.go.kr/api/search.do?key=${apiKey}&q=${encodeURIComponent(startWith)}&type_search=start&part=word&sort=popular&num=30&output=json`;
       const res = await fetch(apiUrl);
       if (!res.ok) return json({ error: `사전 API 오류: ${res.status}` }, 502);
+
       const data = await res.json();
       const items = data?.channel?.item || [];
-      // 명사만 필터링, 2~4글자 단어, 특수문자 없는 것
-      const words = items
-        .map(item => item.word?.replace(/-/g, '').replace(/\^/g, '').trim())
-        .filter(w => w && w.length >= 2 && w.length <= 4 && /^[가-힣]+$/.test(w) && w.startsWith(startWith));
-      return json({ startWith, words: [...new Set(words)] });
+
+      // 필터링: 순수 한글, 2~5글자, 해당 글자로 시작, 이미 사용한 단어 제외
+      // 주의: API가 반환하는 word에 '-', '^', '__', 공백 등이 포함될 수 있음
+      const words = [];
+      for (const item of items) {
+        // 특수문자 제거해서 실제 단어 추출
+        const cleaned = (item.word || '')
+          .replace(/-/g, '')
+          .replace(/\^/g, '')
+          .replace(/__/g, '')
+          .replace(/\s/g, '')
+          .trim();
+
+        // 조건: 순수 한글 2~5글자 + 첫 글자 일치
+        if (
+          cleaned.length >= 2 &&
+          cleaned.length <= 5 &&
+          /^[가-힣]+$/.test(cleaned) &&
+          cleaned.charAt(0) === startWith
+        ) {
+          words.push(cleaned);
+        }
+      }
+
+      // 중복 제거
+      const unique = [...new Set(words)];
+
+      // words가 비면 필터 없이 한글 단어만 반환 (더 관대하게)
+      if (unique.length === 0) {
+        const fallback = [];
+        for (const item of items) {
+          const cleaned = (item.word || '')
+            .replace(/-/g, '').replace(/\^/g, '').replace(/__/g, '').replace(/\s/g, '').trim();
+          if (/^[가-힣]+$/.test(cleaned) && cleaned.length >= 2 && cleaned.length <= 6) {
+            fallback.push(cleaned);
+          }
+        }
+        return json({ startWith, words: [...new Set(fallback)], filtered: false, total: items.length });
+      }
+
+      return json({ startWith, words: unique, filtered: true, total: items.length });
     } catch (err) {
       return json({ error: err.message }, 500);
     }
@@ -42,7 +80,7 @@ export async function onRequestGet(context) {
     const data = await res.json();
     const items = data?.channel?.item || [];
     const exact = items.some(item => {
-      const w = item.word?.replace(/-/g, '').replace(/\^/g, '').trim();
+      const w = (item.word || '').replace(/-/g, '').replace(/\^/g, '').replace(/__/g, '').trim();
       return w === word;
     });
     return json({ word, exists: exact, count: items.length });
