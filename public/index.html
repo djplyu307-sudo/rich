@@ -1,89 +1,604 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>줄넘기 플래너</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f4f7ff;
+  --surface: #ffffff;
+  --accent: #4f8cff;
+  --accent-light: #eaf0ff;
+  --green: #22c97a;
+  --green-light: #e8f9f1;
+  --red: #ff5c5c;
+  --red-light: #fff1f1;
+  --yellow: #f5a623;
+  --yellow-light: #fff8ed;
+  --text: #1a1f36;
+  --muted: #8a93b2;
+  --border: #e4e9f5;
+  --shadow: 0 2px 12px rgba(79,140,255,0.07);
+  --shadow-md: 0 6px 24px rgba(79,140,255,0.13);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'Noto Sans KR',sans-serif; min-height:100vh; }
+.container { max-width:860px; margin:0 auto; padding:0 16px 80px; }
 
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/12.10.0/firebase-app-compat.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/12.10.0/firebase-auth-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-database-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-functions-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-messaging-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-storage-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-analytics-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-remote-config-compat.js"></script>
-    <script defer src="/__/firebase/12.10.0/firebase-performance-compat.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+/* HEADER */
+header { text-align:center; padding:36px 0 24px; }
+.logo-icon { font-size:42px; display:inline-block; animation:bounce 2s infinite; }
+@keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+header h1 { font-family:'Nunito',sans-serif; font-size:clamp(24px,5vw,36px); font-weight:900; color:var(--accent); margin-top:6px; }
+header p  { color:var(--muted); font-size:13px; margin-top:3px; }
 
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
-    </style>
-  </head>
-  <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
+/* TABS */
+.tabs { display:flex; gap:5px; background:#fff; border-radius:16px; padding:5px; margin-bottom:20px; box-shadow:var(--shadow); }
+.tab-btn { flex:1; padding:11px 6px; border:none; border-radius:11px; background:transparent; color:var(--muted); font-family:'Noto Sans KR',sans-serif; font-size:13px; font-weight:500; cursor:pointer; transition:all .2s; }
+.tab-btn.active { background:var(--accent); color:#fff; font-weight:700; box-shadow:0 3px 10px rgba(79,140,255,.28); }
+.tab-content { display:none; }
+.tab-content.active { display:block; }
+
+/* CARD */
+.card { background:#fff; border-radius:18px; padding:20px; margin-bottom:12px; box-shadow:var(--shadow); }
+.card-title { font-family:'Nunito',sans-serif; font-size:15px; font-weight:800; color:var(--text); margin-bottom:14px; }
+
+/* PLAN */
+.phase-selector { display:flex; gap:7px; flex-wrap:wrap; margin-bottom:14px; }
+.phase-btn { padding:7px 15px; border-radius:30px; border:1.5px solid var(--border); background:transparent; color:var(--muted); font-size:13px; font-family:'Noto Sans KR',sans-serif; cursor:pointer; transition:all .18s; }
+.phase-btn.active { border-color:var(--accent); color:var(--accent); background:var(--accent-light); font-weight:700; }
+.week-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:9px; }
+.day-card { background:var(--bg); border-radius:13px; padding:13px; border-top:3px solid transparent; transition:transform .18s,box-shadow .18s; }
+.day-card:hover { transform:translateY(-2px); box-shadow:var(--shadow-md); }
+.day-card.work  { border-top-color:var(--accent); }
+.day-card.light { border-top-color:var(--yellow); }
+.day-card.rest  { border-top-color:var(--border); }
+.day-name { font-family:'Nunito',sans-serif; font-size:17px; font-weight:900; margin-bottom:5px; }
+.day-badge { display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:20px; margin-bottom:7px; }
+.badge-work  { background:var(--accent-light); color:var(--accent); }
+.badge-light { background:var(--yellow-light); color:var(--yellow); }
+.badge-rest  { background:var(--border); color:var(--muted); }
+.day-detail { font-size:12px; color:var(--muted); line-height:1.7; }
+.day-detail strong { color:var(--text); font-weight:700; font-size:13px; }
+
+/* FORM */
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:9px; }
+.form-group { display:flex; flex-direction:column; gap:4px; }
+.form-group label { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; }
+.form-group input,
+.form-group textarea { background:var(--bg); border:1.5px solid var(--border); border-radius:10px; padding:10px 12px; color:var(--text); font-family:'Noto Sans KR',sans-serif; font-size:14px; outline:none; transition:border-color .18s; }
+.form-group input:focus,
+.form-group textarea:focus { border-color:var(--accent); }
+.form-group textarea { resize:vertical; min-height:68px; }
+.intensity-row { display:flex; gap:7px; }
+.intensity-btn { flex:1; padding:10px 4px; border-radius:10px; border:1.5px solid var(--border); background:transparent; color:var(--muted); font-size:12px; font-weight:700; font-family:'Noto Sans KR',sans-serif; cursor:pointer; transition:all .18s; text-align:center; }
+.intensity-btn.sel-low  { border-color:var(--yellow); background:var(--yellow-light); color:var(--yellow); }
+.intensity-btn.sel-mid  { border-color:var(--accent);  background:var(--accent-light);  color:var(--accent); }
+.intensity-btn.sel-high { border-color:var(--red);    background:var(--red-light);    color:var(--red); }
+.btn-primary { width:100%; padding:14px; background:var(--accent); color:#fff; border:none; border-radius:12px; font-family:'Nunito',sans-serif; font-size:16px; font-weight:800; cursor:pointer; transition:all .18s; margin-top:5px; }
+.btn-primary:hover { background:#3a7af0; box-shadow:0 6px 18px rgba(79,140,255,.3); transform:translateY(-1px); }
+
+/* HISTORY */
+.history-list { display:flex; flex-direction:column; gap:7px; }
+.history-item { background:var(--bg); border-radius:11px; padding:11px 14px; display:grid; grid-template-columns:auto 1fr auto; gap:11px; align-items:center; animation:slideIn .25s ease; }
+@keyframes slideIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }
+.history-date { font-size:12px; color:var(--muted); white-space:nowrap; }
+.history-title { font-weight:700; font-size:14px; margin-bottom:2px; }
+.history-sub   { font-size:12px; color:var(--muted); }
+.history-kcal  { font-family:'Nunito',sans-serif; font-size:20px; font-weight:900; color:var(--accent); text-align:right; white-space:nowrap; }
+.history-kcal span { display:block; font-size:10px; color:var(--muted); font-family:'Noto Sans KR'; font-weight:400; }
+.delete-btn { background:none; border:none; color:var(--muted); cursor:pointer; font-size:15px; padding:4px; transition:color .18s; }
+.delete-btn:hover { color:var(--red); }
+
+/* STATS */
+.stats-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(145px,1fr)); gap:9px; margin-bottom:12px; }
+.stat-card { background:var(--accent-light); border-radius:14px; padding:15px; text-align:center; }
+.stat-value { font-family:'Nunito',sans-serif; font-size:28px; font-weight:900; color:var(--accent); line-height:1.1; }
+.stat-unit { font-size:12px; color:var(--muted); margin-top:3px; }
+.progress-section { margin-bottom:12px; }
+.progress-label { display:flex; justify-content:space-between; font-size:13px; font-weight:500; margin-bottom:5px; }
+.progress-bar  { height:8px; background:var(--border); border-radius:10px; overflow:hidden; }
+.progress-fill { height:100%; border-radius:10px; background:linear-gradient(90deg,var(--accent),#7ab8ff); transition:width .8s cubic-bezier(.17,.67,.35,.99); }
+
+/* CHART */
+.chart-wrap { height:155px; }
+.chart-bars { display:flex; align-items:flex-end; gap:5px; height:135px; padding:0 2px; }
+.chart-bar-col { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; height:100%; justify-content:flex-end; }
+.chart-bar { width:100%; border-radius:5px 5px 0 0; background:linear-gradient(180deg,var(--accent) 0%,#b8d4ff 100%); min-height:4px; position:relative; cursor:default; transition:height .6s cubic-bezier(.17,.67,.35,.99); }
+.chart-bar:hover::after { content:attr(data-val); position:absolute; top:-24px; left:50%; transform:translateX(-50%); font-size:11px; background:var(--accent); color:#fff; padding:2px 6px; border-radius:5px; white-space:nowrap; font-weight:700; }
+.chart-label { font-size:10px; color:var(--muted); }
+.no-data { text-align:center; color:var(--muted); padding:36px 0; font-size:13px; }
+
+/* VS */
+.goal-chips { display:flex; flex-wrap:wrap; gap:7px; }
+.goal-chip { display:inline-flex; align-items:center; gap:5px; background:var(--accent-light); color:var(--accent); font-size:13px; font-weight:700; padding:6px 14px; border-radius:20px; }
+.vs-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-bottom:12px; }
+.vs-card { border-radius:14px; padding:16px; }
+.vs-card.over  { background:var(--green-light); }
+.vs-card.under { background:var(--red-light); }
+.vs-icon  { font-size:18px; margin-bottom:5px; display:block; }
+.vs-label { font-size:11px; font-weight:700; color:var(--muted); margin-bottom:5px; }
+.vs-numbers { display:flex; align-items:baseline; gap:3px; margin-bottom:7px; }
+.vs-actual { font-family:'Nunito',sans-serif; font-size:26px; font-weight:900; line-height:1; }
+.vs-actual.over  { color:var(--green); }
+.vs-actual.under { color:var(--red); }
+.vs-plan { font-size:12px; color:var(--muted); }
+.vs-bar-wrap { height:5px; background:rgba(0,0,0,.07); border-radius:5px; overflow:hidden; margin-bottom:5px; }
+.vs-bar-fill { height:100%; border-radius:5px; transition:width .8s cubic-bezier(.17,.67,.35,.99); }
+.vs-bar-fill.over  { background:var(--green); }
+.vs-bar-fill.under { background:var(--red); }
+.vs-pct { font-size:12px; font-weight:700; }
+.vs-pct.over  { color:var(--green); }
+.vs-pct.under { color:var(--red); }
+
+/* WEEK ROWS */
+.week-rows { display:flex; flex-direction:column; gap:7px; }
+.week-row { background:var(--bg); border-radius:11px; padding:11px 14px; display:grid; grid-template-columns:65px 1fr 52px; gap:11px; align-items:center; }
+.week-row-label { font-size:12px; font-weight:700; color:var(--text); }
+.week-row-date  { font-size:10px; color:var(--muted); }
+.week-row-bar-wrap { height:8px; background:var(--border); border-radius:8px; overflow:hidden; }
+.week-row-bar { height:100%; border-radius:8px; transition:width .7s cubic-bezier(.17,.67,.35,.99); }
+.week-row-pct { font-family:'Nunito',sans-serif; font-size:13px; font-weight:900; text-align:right; }
+
+/* CALENDAR */
+.cal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.cal-nav { background:var(--bg); border:1.5px solid var(--border); border-radius:8px; color:var(--text); font-size:16px; width:32px; height:32px; cursor:pointer; transition:all .18s; display:flex; align-items:center; justify-content:center; }
+.cal-nav:hover { background:var(--accent-light); border-color:var(--accent); }
+.cal-month-label { font-family:'Nunito',sans-serif; font-size:15px; font-weight:900; color:var(--text); }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+.cal-dow  { text-align:center; font-size:11px; font-weight:700; color:var(--muted); padding:2px 0 5px; }
+.cal-cell { aspect-ratio:1; border-radius:9px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:12px; font-weight:500; transition:transform .15s; }
+.cal-cell.done     { background:var(--green-light); color:var(--green); font-weight:700; }
+.cal-cell.done:hover { transform:scale(1.1); }
+.cal-cell.missed   { background:var(--red-light); color:var(--red); }
+.cal-cell.rest-day { color:var(--muted); }
+.cal-cell.future   { color:var(--muted); opacity:.3; }
+.cal-cell.today-cell { outline:2px solid var(--accent); outline-offset:1px; }
+.cal-cell.empty    { background:transparent; }
+.cal-dot { width:4px; height:4px; border-radius:50%; background:var(--green); margin-top:1px; }
+.cal-legend { display:flex; gap:12px; flex-wrap:wrap; margin-top:11px; }
+.legend-item { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--muted); }
+.legend-dot { width:10px; height:10px; border-radius:3px; }
+
+/* EMPTY */
+.empty-state { text-align:center; padding:44px 0; color:var(--muted); font-size:13px; }
+.empty-icon  { font-size:38px; margin-bottom:8px; }
+
+@media (max-width:500px) {
+  .form-row  { grid-template-columns:1fr; }
+  .week-grid { grid-template-columns:1fr; }
+  .vs-grid   { grid-template-columns:1fr; }
+  .stats-grid { grid-template-columns:1fr 1fr; }
+  .week-row  { grid-template-columns:58px 1fr 46px; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <span class="logo-icon">🪢</span>
+    <h1>줄넘기 플래너</h1>
+    <p>8주 완성 다이어트 플랜</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('plan',this)">📋 플랜</button>
+    <button class="tab-btn" onclick="switchTab('record',this)">✏️ 기록</button>
+    <button class="tab-btn" onclick="switchTab('vs',this)">🎯 계획vs실적</button>
+    <button class="tab-btn" onclick="switchTab('stats',this)">📊 분석</button>
+  </div>
+
+  <!-- 플랜 -->
+  <div class="tab-content active" id="tab-plan">
+    <div class="card">
+      <div class="card-title">단계 선택</div>
+      <div class="phase-selector">
+        <button class="phase-btn active" onclick="selectPhase(1,this)">1~2주 입문</button>
+        <button class="phase-btn" onclick="selectPhase(2,this)">3~4주 적응</button>
+        <button class="phase-btn" onclick="selectPhase(3,this)">5~6주 강화</button>
+        <button class="phase-btn" onclick="selectPhase(4,this)">7~8주 완성</button>
+      </div>
     </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
+    <div id="plan-phase-content"></div>
+  </div>
 
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const loadEl = document.querySelector('#load');
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.firestore().doc('/foo/bar').get().then(() => { });
-        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        // firebase.analytics(); // call to activate
-        // firebase.analytics().logEvent('tutorial_completed');
-        // firebase.performance(); // call to activate
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+  <!-- 기록 -->
+  <div class="tab-content" id="tab-record">
+    <div class="card">
+      <div class="card-title">오늘 기록</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>날짜</label>
+          <input type="date" id="rec-date">
+        </div>
+        <div class="form-group">
+          <label>운동 시간 (분)</label>
+          <input type="number" id="rec-min" placeholder="20" min="1" max="180">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>횟수 (개)</label>
+          <input type="number" id="rec-count" placeholder="500" min="0">
+        </div>
+        <div class="form-group">
+          <label>체중 kg (선택)</label>
+          <input type="number" id="rec-weight" placeholder="65.0" step="0.1">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:9px">
+        <label>강도</label>
+        <div class="intensity-row">
+          <button class="intensity-btn" onclick="selectIntensity('low',this)">🟡 가볍게</button>
+          <button class="intensity-btn" onclick="selectIntensity('mid',this)">🟢 보통</button>
+          <button class="intensity-btn" onclick="selectIntensity('high',this)">🔴 강하게</button>
+        </div>
+        <input type="hidden" id="rec-intensity">
+      </div>
+      <div class="form-group">
+        <label>메모 (선택)</label>
+        <textarea id="rec-memo" placeholder="컨디션, 느낌 등..."></textarea>
+      </div>
+      <button class="btn-primary" onclick="saveRecord()">저장</button>
+    </div>
+    <div class="card">
+      <div class="card-title">최근 기록</div>
+      <div id="history-list" class="history-list">
+        <div class="empty-state"><div class="empty-icon">📭</div>기록이 없어요</div>
+      </div>
+    </div>
+  </div>
 
-        try {
-          let app = firebase.app();
-          let features = [
-            'auth', 
-            'database', 
-            'firestore',
-            'functions',
-            'messaging', 
-            'storage', 
-            'analytics', 
-            'remoteConfig',
-            'performance',
-          ].filter(feature => typeof app[feature] === 'function');
-          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
-        }
-      });
-    </script>
-  </body>
+  <!-- 계획 vs 실적 -->
+  <div class="tab-content" id="tab-vs">
+    <div class="card">
+      <div class="card-title">주간 목표</div>
+      <div class="goal-chips">
+        <span class="goal-chip">🗓 주 5일</span>
+        <span class="goal-chip">⏱ 회당 20분</span>
+        <span class="goal-chip">🔥 주 1,400 kcal</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">이번 주 달성</div>
+      <div class="vs-grid" id="vs-cards"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">주차별 달성률</div>
+      <div class="week-rows" id="vs-week-rows"></div>
+    </div>
+    <div class="card">
+      <div class="cal-header">
+        <div class="card-title" style="margin:0">달성 캘린더</div>
+        <div style="display:flex;align-items:center;gap:7px">
+          <button class="cal-nav" onclick="calMove(-1)">‹</button>
+          <span class="cal-month-label" id="cal-month-label"></span>
+          <button class="cal-nav" onclick="calMove(1)">›</button>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <div class="cal-grid" id="cal-grid"></div>
+      </div>
+      <div class="cal-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--green-light);border:1px solid var(--green)"></div>완료</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--red-light);border:1px solid var(--red)"></div>미실시</div>
+        <div class="legend-item"><div class="legend-dot" style="border:1px solid var(--border)"></div>휴식</div>
+        <div class="legend-item"><div class="legend-dot" style="outline:2px solid var(--accent);outline-offset:1px"></div>오늘</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 분석 -->
+  <div class="tab-content" id="tab-stats">
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-value" id="stat-total-days">0</div><div class="stat-unit">총 운동일</div></div>
+      <div class="stat-card"><div class="stat-value" id="stat-total-min">0</div><div class="stat-unit">총 운동(분)</div></div>
+      <div class="stat-card"><div class="stat-value" id="stat-total-kcal">0</div><div class="stat-unit">총 소모 kcal</div></div>
+      <div class="stat-card"><div class="stat-value" id="stat-weight-diff">-</div><div class="stat-unit">체중 변화(kg)</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">8주 목표 달성률</div>
+      <div class="progress-section">
+        <div class="progress-label"><span>운동일</span><span id="prog-days-label">0 / 40일</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="prog-days" style="width:0%"></div></div>
+      </div>
+      <div class="progress-section">
+        <div class="progress-label"><span>칼로리</span><span id="prog-kcal-label">0 / 16,000 kcal</span></div>
+        <div class="progress-bar"><div class="progress-fill" id="prog-kcal" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">최근 7일 운동(분)</div>
+      <div class="chart-wrap"><div class="chart-bars" id="chart-bars"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">체중 변화</div>
+      <div class="chart-wrap"><div class="chart-bars" id="chart-weight"></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PHASES = [
+  { label:'1~2주 입문기', days:[
+    {name:'월',type:'work', badge:'운동', bc:'badge-work', title:'기초 줄넘기',detail:'양발 모아 뛰기<br><strong>10분</strong> · 50개×4세트 · 세트 간 1분 휴식'},
+    {name:'화',type:'work', badge:'운동', bc:'badge-work', title:'리듬 줄넘기',detail:'천천히 리듬 맞추기<br><strong>10분</strong> · 속도 조절 연습'},
+    {name:'수',type:'rest', badge:'휴식', bc:'badge-rest', title:'스트레칭',detail:'가볍게 스트레칭 또는 완전 휴식'},
+    {name:'목',type:'work', badge:'운동', bc:'badge-work', title:'기초 줄넘기',detail:'양발 모아 뛰기<br><strong>12분</strong> · 60개×4세트'},
+    {name:'금',type:'work', badge:'운동', bc:'badge-work', title:'조깅+줄넘기',detail:'제자리 조깅 5분<br>줄넘기 <strong>10분</strong> · 마무리 걷기 3분'},
+    {name:'토',type:'light',badge:'가볍게',bc:'badge-light',title:'릴렉스 점프',detail:'천천히 15분 · 스트레칭 10분'},
+    {name:'일',type:'rest', badge:'휴식', bc:'badge-rest', title:'완전 휴식',detail:'충분한 수면 · 영양 보충'},
+  ]},
+  { label:'3~4주 적응기', days:[
+    {name:'월',type:'work', badge:'운동', bc:'badge-work', title:'인터벌',detail:'빠르게 30초 + 쉬기 30초<br><strong>15분</strong> · 약 200개'},
+    {name:'화',type:'work', badge:'운동', bc:'badge-work', title:'교차 줄넘기',detail:'양발→교차 반복<br><strong>15분</strong>'},
+    {name:'수',type:'rest', badge:'휴식', bc:'badge-rest', title:'산책',detail:'20~30분 걷기 · 스트레칭'},
+    {name:'목',type:'work', badge:'운동', bc:'badge-work', title:'연속 줄넘기',detail:'<strong>3분×4세트</strong> · 세트 간 2분 휴식'},
+    {name:'금',type:'work', badge:'운동', bc:'badge-work', title:'복합 운동',detail:'줄넘기 10분<br>스쿼트 20개×3세트'},
+    {name:'토',type:'light',badge:'가볍게',bc:'badge-light',title:'리듬 점프',detail:'음악 맞춰 20분'},
+    {name:'일',type:'rest', badge:'휴식', bc:'badge-rest', title:'완전 휴식',detail:'충분한 수면'},
+  ]},
+  { label:'5~6주 강화기', days:[
+    {name:'월',type:'work', badge:'운동', bc:'badge-work', title:'HIIT',detail:'최대 속도 45초+휴식 15초<br><strong>20분</strong> · ≈200kcal'},
+    {name:'화',type:'work', badge:'운동', bc:'badge-work', title:'더블언더',detail:'한 번 점프 2회전 연습<br><strong>20분</strong>'},
+    {name:'수',type:'rest', badge:'회복', bc:'badge-rest', title:'액티브 리커버리',detail:'요가 or 스트레칭 30분'},
+    {name:'목',type:'work', badge:'운동', bc:'badge-work', title:'서킷',detail:'줄넘기 3분→버피 10개<br>×4라운드'},
+    {name:'금',type:'work', badge:'운동', bc:'badge-work', title:'지속력',detail:'멈추지 않고<br><strong>25분 연속</strong>'},
+    {name:'토',type:'light',badge:'가볍게',bc:'badge-light',title:'리듬 점프',detail:'음악과 함께 20분'},
+    {name:'일',type:'rest', badge:'휴식', bc:'badge-rest', title:'완전 휴식',detail:'충분한 수면'},
+  ]},
+  { label:'7~8주 완성기', days:[
+    {name:'월',type:'work', badge:'운동', bc:'badge-work', title:'맥스 인터벌',detail:'최대 속도 1분+휴식 30초<br><strong>25분</strong> · ≈250kcal'},
+    {name:'화',type:'work', badge:'운동', bc:'badge-work', title:'더블언더 집중',detail:'더블언더 100개<br>+일반 줄넘기 10분'},
+    {name:'수',type:'rest', badge:'회복', bc:'badge-rest', title:'폼롤러',detail:'근막 이완 20분'},
+    {name:'목',type:'work', badge:'운동', bc:'badge-work', title:'복합 서킷',detail:'줄넘기 4분→플랭크 1분<br>→스쿼트 15개×5라운드'},
+    {name:'금',type:'work', badge:'운동', bc:'badge-work', title:'30분 도전',detail:'멈추지 않고<br><strong>30분 연속</strong> · ≈300kcal'},
+    {name:'토',type:'light',badge:'가볍게',bc:'badge-light',title:'마무리 점프',detail:'8주 회고하며 20분 🎉'},
+    {name:'일',type:'rest', badge:'휴식', bc:'badge-rest', title:'스스로 칭찬하기 🎉'},
+  ]},
+];
+
+let records = JSON.parse(localStorage.getItem('jr_records') || '[]');
+const goals = { days:5, min:20, kcal:1400 };
+let calYear, calMonth;
+
+window.onload = () => {
+  const now = new Date();
+  calYear = now.getFullYear(); calMonth = now.getMonth();
+  document.getElementById('rec-date').value = todayStr();
+  selectPhase(1, document.querySelector('.phase-btn.active'));
+  renderHistory();
+  renderStats();
+};
+
+const todayStr = () => new Date().toISOString().split('T')[0];
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'stats') renderStats();
+  if (name === 'vs')    renderVS();
+}
+
+function selectPhase(n, btn) {
+  document.querySelectorAll('.phase-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const p = PHASES[n-1];
+  document.getElementById('plan-phase-content').innerHTML = `
+    <div class="card">
+      <div class="card-title">${p.label}</div>
+      <div class="week-grid">
+        ${p.days.map(d=>`
+          <div class="day-card ${d.type}">
+            <div class="day-name">${d.name}요일</div>
+            <div class="day-badge ${d.bc}">${d.badge}</div>
+            <div class="day-detail"><strong>${d.title}</strong><br>${d.detail}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+function selectIntensity(level, btn) {
+  document.querySelectorAll('.intensity-btn').forEach(b => b.classList.remove('sel-low','sel-mid','sel-high'));
+  btn.classList.add({low:'sel-low',mid:'sel-mid',high:'sel-high'}[level]);
+  document.getElementById('rec-intensity').value = level;
+}
+
+const calcKcal = (min, intensity) =>
+  Math.round(min * ({low:7,mid:10,high:13}[intensity] || 10));
+
+function saveRecord() {
+  const date      = document.getElementById('rec-date').value;
+  const min       = parseInt(document.getElementById('rec-min').value) || 0;
+  const count     = parseInt(document.getElementById('rec-count').value) || 0;
+  const weight    = parseFloat(document.getElementById('rec-weight').value) || null;
+  const intensity = document.getElementById('rec-intensity').value;
+  const memo      = document.getElementById('rec-memo').value;
+  if (!date || !min)  { alert('날짜와 운동 시간을 입력해주세요.'); return; }
+  if (!intensity)     { alert('강도를 선택해주세요.'); return; }
+  const kcal = calcKcal(min, intensity);
+  records.unshift({ id:Date.now(), date, min, count, weight, intensity, memo, kcal });
+  localStorage.setItem('jr_records', JSON.stringify(records));
+  ['rec-min','rec-count','rec-weight','rec-memo','rec-intensity'].forEach(id =>
+    document.getElementById(id).value = '');
+  document.querySelectorAll('.intensity-btn').forEach(b =>
+    b.classList.remove('sel-low','sel-mid','sel-high'));
+  renderHistory();
+  alert(`저장 완료! 🔥 ${kcal} kcal`);
+}
+
+function deleteRecord(id) {
+  records = records.filter(r => String(r.id) !== String(id));
+  localStorage.setItem('jr_records', JSON.stringify(records));
+  renderHistory(); renderStats();
+}
+
+const INT_LABEL = { low:'🟡 가볍게', mid:'🟢 보통', high:'🔴 강하게' };
+
+function renderHistory() {
+  const el = document.getElementById('history-list');
+  if (!records.length) { el.innerHTML='<div class="empty-state"><div class="empty-icon">📭</div>기록이 없어요</div>'; return; }
+  el.innerHTML = records.slice(0,20).map(r=>`
+    <div class="history-item">
+      <div class="history-date">${r.date}</div>
+      <div>
+        <div class="history-title">${r.min}분${r.count?` · ${r.count.toLocaleString()}개`:''}</div>
+        <div class="history-sub">${INT_LABEL[r.intensity]||''}${r.weight?` · ${r.weight}kg`:''}${r.memo?` · ${r.memo.slice(0,20)}`:''}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="history-kcal">${r.kcal}<span>kcal</span></div>
+        <button class="delete-btn" data-id="${r.id}" onclick="event.stopPropagation();deleteRecord(this.dataset.id)">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+function renderStats() {
+  const totalDays = records.length;
+  const totalMin  = records.reduce((s,r)=>s+(r.min||0),0);
+  const totalKcal = records.reduce((s,r)=>s+(r.kcal||0),0);
+  const wRecs = records.filter(r=>r.weight).sort((a,b)=>a.date.localeCompare(b.date));
+  let wDiff = '-';
+  if (wRecs.length>=2) { const d=(wRecs.at(-1).weight-wRecs[0].weight).toFixed(1); wDiff=(d>0?'+':'')+d; }
+  document.getElementById('stat-total-days').textContent  = totalDays;
+  document.getElementById('stat-total-min').textContent   = totalMin;
+  document.getElementById('stat-total-kcal').textContent  = totalKcal.toLocaleString();
+  document.getElementById('stat-weight-diff').textContent = wDiff;
+  const dayPct  = Math.min(100,Math.round(totalDays/40*100));
+  const kcalPct = Math.min(100,Math.round(totalKcal/16000*100));
+  document.getElementById('prog-days').style.width  = dayPct+'%';
+  document.getElementById('prog-kcal').style.width  = kcalPct+'%';
+  document.getElementById('prog-days-label').textContent  = `${totalDays} / 40일`;
+  document.getElementById('prog-kcal-label').textContent  = `${totalKcal.toLocaleString()} / 16,000 kcal`;
+  renderBarChart(); renderWeightChart();
+}
+
+function renderBarChart() {
+  const el = document.getElementById('chart-bars');
+  const days = [];
+  for (let i=6;i>=0;i--) {
+    const d=new Date(); d.setDate(d.getDate()-i);
+    const ds=d.toISOString().split('T')[0];
+    const rec=records.find(r=>r.date===ds);
+    days.push({label:['일','월','화','수','목','금','토'][d.getDay()],val:rec?rec.min:0});
+  }
+  const max=Math.max(...days.map(d=>d.val),1);
+  el.innerHTML=days.map(d=>`
+    <div class="chart-bar-col">
+      <div class="chart-bar" style="height:${Math.round(d.val/max*120)}px" data-val="${d.val}분"></div>
+      <div class="chart-label">${d.label}</div>
+    </div>`).join('');
+}
+
+function renderWeightChart() {
+  const el=document.getElementById('chart-weight');
+  const wRecs=records.filter(r=>r.weight).sort((a,b)=>a.date.localeCompare(b.date)).slice(-10);
+  if (!wRecs.length) { el.innerHTML='<div class="no-data">체중 기록이 없어요</div>'; return; }
+  const max=Math.max(...wRecs.map(r=>r.weight));
+  const min=Math.min(...wRecs.map(r=>r.weight));
+  const range=max-min||1;
+  el.innerHTML=wRecs.map(r=>{
+    const h=Math.round(((r.weight-min)/range)*100+20);
+    return `<div class="chart-bar-col">
+      <div class="chart-bar" style="height:${h}px;background:linear-gradient(180deg,var(--yellow),#ffe0a0)" data-val="${r.weight}kg"></div>
+      <div class="chart-label">${r.date.slice(5)}</div>
+    </div>`;
+  }).join('');
+}
+
+// VS
+function getWeekStart(date) {
+  const d=new Date(date), day=d.getDay();
+  d.setDate(d.getDate()+(day===0?-6:1-day)); d.setHours(0,0,0,0); return d;
+}
+function getWeekDates(ws) {
+  return Array.from({length:7},(_,i)=>{ const d=new Date(ws); d.setDate(d.getDate()+i); return d.toISOString().split('T')[0]; });
+}
+
+function renderVS() { renderVSCards(); renderWeekRows(); renderCalendar(); }
+
+function renderVSCards() {
+  const dates=getWeekDates(getWeekStart(new Date()));
+  const wr=records.filter(r=>dates.includes(r.date));
+  const metrics=[
+    {label:'운동 횟수',actual:wr.length,                        plan:goals.days,          unit:'일',  icon:'🗓'},
+    {label:'운동 시간',actual:wr.reduce((s,r)=>s+r.min,0),     plan:goals.days*goals.min, unit:'분',  icon:'⏱'},
+    {label:'칼로리',   actual:wr.reduce((s,r)=>s+r.kcal,0),    plan:goals.kcal,           unit:'kcal',icon:'🔥'},
+  ];
+  document.getElementById('vs-cards').innerHTML=metrics.map(m=>{
+    const pct=Math.min(100,Math.round(m.actual/m.plan*100));
+    const cls=pct>=100?'over':'under';
+    const rem=(m.plan-m.actual).toLocaleString();
+    return `<div class="vs-card ${cls}">
+      <span class="vs-icon">${m.icon}</span>
+      <div class="vs-label">${m.label}</div>
+      <div class="vs-numbers">
+        <div class="vs-actual ${cls}">${m.actual.toLocaleString()}</div>
+        <div class="vs-plan"> / ${m.plan.toLocaleString()}${m.unit}</div>
+      </div>
+      <div class="vs-bar-wrap"><div class="vs-bar-fill ${cls}" style="width:${pct}%"></div></div>
+      <div class="vs-pct ${cls}">${pct>=100?'✅ 달성!':`${pct}% · ${rem}${m.unit} 남음`}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderWeekRows() {
+  const el=document.getElementById('vs-week-rows');
+  if (!records.length) { el.innerHTML='<div class="no-data">기록이 없어요</div>'; return; }
+  const sorted=[...records].sort((a,b)=>a.date.localeCompare(b.date));
+  let ws=getWeekStart(new Date(sorted[0].date));
+  const now=new Date(); now.setHours(0,0,0,0);
+  const rows=[]; let wn=1;
+  while (ws<=now && wn<=20) {
+    const dates=getWeekDates(ws);
+    const done=records.filter(r=>dates.includes(r.date)).length;
+    const pct=Math.min(100,Math.round(done/goals.days*100));
+    const color=pct>=100?'var(--green)':pct>=60?'var(--yellow)':'var(--red)';
+    rows.push({wn,label:`${ws.getMonth()+1}/${ws.getDate()}`,done,pct,color});
+    ws=new Date(ws); ws.setDate(ws.getDate()+7); wn++;
+  }
+  el.innerHTML=rows.map(r=>`
+    <div class="week-row">
+      <div class="week-row-label">${r.wn}주차<br><span class="week-row-date">${r.label}~</span></div>
+      <div class="week-row-bar-wrap"><div class="week-row-bar" style="width:${r.pct}%;background:${r.color}"></div></div>
+      <div class="week-row-pct" style="color:${r.color}">${r.done}/${goals.days}일</div>
+    </div>`).join('');
+}
+
+function calMove(dir) {
+  calMonth+=dir;
+  if (calMonth>11){calMonth=0;calYear++;} if (calMonth<0){calMonth=11;calYear--;}
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const td=todayStr();
+  const mNames=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+  document.getElementById('cal-month-label').textContent=`${calYear}년 ${mNames[calMonth]}`;
+  const firstDay=new Date(calYear,calMonth,1);
+  const lastDay =new Date(calYear,calMonth+1,0);
+  let startDow=firstDay.getDay(); startDow=startDow===0?6:startDow-1;
+  const recDates=new Set(records.map(r=>r.date));
+  const dows=['월','화','수','목','금','토','일'];
+  let html=dows.map(d=>`<div class="cal-dow">${d}</div>`).join('');
+  for (let i=0;i<startDow;i++) html+='<div class="cal-cell empty"></div>';
+  for (let d=1;d<=lastDay.getDate();d++) {
+    const ds=`${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isFuture=ds>td, isToday=ds===td, isDone=recDates.has(ds);
+    const isRest=new Date(ds).getDay()===0;
+    let cls='cal-cell', dot='';
+    if      (isFuture) cls+=' future';
+    else if (isDone)   { cls+=' done'; dot='<div class="cal-dot"></div>'; }
+    else if (isRest)   cls+=' rest-day';
+    else               cls+=' missed';
+    if (isToday) cls+=' today-cell';
+    html+=`<div class="${cls}">${d}${dot}</div>`;
+  }
+  document.getElementById('cal-grid').innerHTML=html;
+}
+</script>
+</body>
 </html>
