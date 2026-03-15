@@ -885,18 +885,15 @@ let chainInputLocked = false; // AI 응답 대기 중 중복 입력 방지
 
 function lastCh(w) { return w.charAt(w.length - 1); }
 
-// 국립국어원 API로 단어 실존 여부 확인
+// 단어 실존 여부 확인 — DB 기반 (API 대신)
+// CHAIN_DB에 있거나, 2글자 이상 한글이면 허용
 async function checkWordExists(word) {
-  try {
-    const res = await fetch(`/korean-dict?word=${encodeURIComponent(word)}`);
-    if (!res.ok) throw new Error('API 오류');
-    const data = await res.json();
-    return data.exists === true;
-  } catch (e) {
-    // API 실패 시 단어 길이 2글자 이상이면 허용 (폴백)
-    console.warn('사전 API 오류, 폴백 적용:', e.message);
-    return word.length >= 2;
+  // DB에 있는 단어면 바로 통과
+  for (const key of Object.keys(CHAIN_DB)) {
+    if (CHAIN_DB[key].includes(word)) return true;
   }
+  // DB에 없어도 2글자 이상 한글이면 일단 허용 (AI가 이어받지 못하면 AI가 짐)
+  return /^[가-힣]{2,}$/.test(word);
 }
 
 // AI 응답 단어: 확장된 CHAIN_DB에서 찾기
@@ -981,16 +978,14 @@ async function submitChain() {
     return;
   }
 
-  // 3. 국립국어원 API로 실제 단어인지 검증
+  // 3. 단어 검증 (즉시)
   setChainLock(true);
-  addCHint(`🔍 "${word}" 확인 중...`);
-
   const exists = await checkWordExists(word);
   if (!exists) {
-    // 사전에 없는 단어
-    addCHint(`❌ "${word}"은(는) 표준국어대사전에 없는 단어예요!`);
+    addCHint(`❌ "${word}"은(는) 한글 단어가 아니에요!`);
     setChainLock(false);
-    inp.focus();
+    const inp2 = document.getElementById('chi');
+    if (inp2) inp2.focus();
     return;
   }
 
